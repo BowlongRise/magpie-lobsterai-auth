@@ -52,6 +52,23 @@ Requests carry the account's Bearer token, LobsterAI client headers and
 - LobsterAI's `yd-fast` / `yd-ultra` entries are server-side virtual presets
   that must be resolved per session, so this plugin lists real models only.
 
+## Relation to Providers Hub
+
+`magpie-providers-hub` in the Magpie plugin market also covers the LobsterAI
+channel (provider id `hub-lobsterai`) with the same sign-in flow and model
+endpoint. It differs from this package in that:
+
+- it is an eleven-channel hub; this package is LobsterAI only, so upgrades and
+  debugging are independent;
+- this package sends LobsterAI's `lobsterai_options` thinking levels and follows
+  Kimi K3's fixed request contract, which the hub does not;
+- this package shows plan credit usage from `/api/user/quota`, which the hub's
+  LobsterAI entry has no usage hook for;
+- this package sends `X-LobsterAI-Account-Mode` / `X-LobsterAI-Enterprise-Id`
+  when the sign-in response names an enterprise.
+
+Both sign in to the same channel with the same account, and share one credit pool.
+
 ## Development
 
 ```bash

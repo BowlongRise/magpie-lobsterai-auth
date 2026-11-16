@@ -112,6 +112,20 @@ https://lobsterai-server.youdao.com/api/proxy/v1/chat/completions
 Magpie 把插件账号保存在自己的 `plugin-auth.json`（权限 600）。插件**不会读取** LobsterAI
 桌面端的数据库、Cookie 或凭据文件，也不会把 token 写进日志。
 
+## 与 Providers Hub 的关系
+
+Magpie 插件市场里的 `magpie-providers-hub` 也接了 LobsterAI 渠道（provider id
+`hub-lobsterai`），登录方式和模型接口与本插件相同。两者的区别：
+
+- 那个是十一个渠道的聚合包，本插件是只做 LobsterAI 的独立包，升级和排错都互不影响。
+- 本插件发送 LobsterAI 的 `lobsterai_options` 思考档位，并遵守 Kimi K3 的固定请求契约；
+  聚合包没有这两个。
+- 本插件从 `/api/user/quota` 显示套餐积分用量，聚合包的 LobsterAI 条目没有用量钩子。
+- 本插件识别登录响应里的企业上下文，发送 `X-LobsterAI-Account-Mode` /
+  `X-LobsterAI-Enterprise-Id`。
+
+同一个账号在两个插件里登录的是同一条渠道，积分池也是同一个。
+
 ## 开发
 
 ```bash
