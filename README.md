@@ -1,4 +1,4 @@
-# opencode-lobsterai-auth
+# magpie-lobsterai-auth
 
 把 **网易有道 LobsterAI（有道龙虾）** 的套餐模型接入 Magpie / OpenCode。
 
@@ -39,7 +39,7 @@ magpie plugin add ./magpie-lobsterai-auth
 magpie plugin add github:<你的 GitHub 用户名>/magpie-lobsterai-auth
 
 # 发布到 npm 后
-magpie plugin add opencode-lobsterai-auth
+magpie plugin add magpie-lobsterai-auth
 ```
 
 登录并测试：

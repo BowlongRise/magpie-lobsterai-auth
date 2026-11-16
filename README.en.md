@@ -1,4 +1,4 @@
-# opencode-lobsterai-auth
+# magpie-lobsterai-auth
 
 An **unofficial** Magpie / OpenCode provider plugin for **NetEase Youdao LobsterAI**
 (有道龙虾).
@@ -22,6 +22,9 @@ Provider id: `lobsterai`. After sign-in, models appear as `lobsterai/<model>`.
 magpie plugin add ./magpie-lobsterai-auth
 # or, after pushing to GitHub:
 magpie plugin add github:<owner>/magpie-lobsterai-auth
+
+# or, after publishing to npm:
+magpie plugin add magpie-lobsterai-auth
 ```
 
 ```bash
