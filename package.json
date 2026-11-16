@@ -1,0 +1,51 @@
+{
+  "name": "opencode-lobsterai-auth",
+  "version": "0.1.0",
+  "description": "Unofficial OpenCode / Magpie provider plugin for NetEase Youdao LobsterAI (有道龙虾): browser sign-in, live plan models, token refresh and credit usage.",
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "lib",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "magpie",
+    "lobsterai",
+    "youdao",
+    "netease",
+    "provider"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BowlongRise/magpie-lobsterai-auth.git"
+  },
+  "homepage": "https://github.com/BowlongRise/magpie-lobsterai-auth#readme",
+  "bugs": {
+    "url": "https://github.com/BowlongRise/magpie-lobsterai-auth/issues"
+  },
+  "engines": {
+    "node": ">=20.3"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check index.mjs && node --check lib/auth.mjs && node --check lib/catalog.mjs && node --check lib/constants.mjs && node --check lib/request.mjs && node --check lib/usage.mjs && node --check lib/util.mjs"
+  },
+  "magpie": {
+    "name": "LobsterAI",
+    "icon": "https://raw.githubusercontent.com/netease-youdao/LobsterAI/main/public/logo.png",
+    "summary": {
+      "en": "NetEase Youdao LobsterAI (有道龙虾) with the account's browser sign-in: live plan models, reasoning levels, token renewal and credit usage. Unofficial.",
+      "zh": "网易有道 LobsterAI（有道龙虾）账号浏览器登录：动态套餐模型、思考档位、Token 续期与积分用量。非官方。"
+    },
+    "maxConcurrency": 4
+  }
+}
