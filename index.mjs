@@ -26,6 +26,7 @@ import {
   staticConfigModels,
 } from "./lib/catalog.mjs";
 import { authorizedFetch, requestHeaders } from "./lib/request.mjs";
+import { claimDailyCheckIn } from "./lib/checkin.mjs";
 import { isExpiredCode, normalizeQuota } from "./lib/usage.mjs";
 import { firstString, parseJson } from "./lib/util.mjs";
 
@@ -270,6 +271,24 @@ export async function LobsterAIAuthPlugin({ client } = {}) {
         };
       },
 
+      // magpie's own hook: claims LobsterAI's daily check-in credits, once a day
+      // per account while Settings › Usage › Plugins has it on.
+      async checkin(getAuth) {
+        const auth = await readAuth(getAuth);
+        if (!auth?.access && !auth?.refresh) {
+          return { outcome: "failed", message: "LobsterAI 未登录", signIn: "expired" };
+        }
+        try {
+          return await claimDailyCheckIn({ getAuth, client, fetchImpl: fetch });
+        } catch (error) {
+          return {
+            outcome: "failed",
+            message: error instanceof Error ? error.message : String(error),
+            ...(error?.signIn === "expired" ? { signIn: "expired" } : {}),
+          };
+        }
+      },
+
       async usage(getAuth) {
         const auth = await readAuth(getAuth);
         if (!auth?.access && !auth?.refresh) {
@@ -373,6 +392,7 @@ export const _internal = {
   QUOTA_PATH,
   accountFromAccess,
   beginBrowserLogin,
+  claimDailyCheckIn,
   exchangeCode,
   modelInfo,
   normalizeQuota,

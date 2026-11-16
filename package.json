@@ -1,6 +1,6 @@
 {
   "name": "magpie-lobsterai-auth",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Unofficial OpenCode / Magpie provider plugin for NetEase Youdao LobsterAI (有道龙虾): browser sign-in, live plan models, token refresh and credit usage.",
   "type": "module",
   "main": "./index.mjs",
@@ -45,7 +45,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "check": "node --check index.mjs && node --check lib/auth.mjs && node --check lib/catalog.mjs && node --check lib/constants.mjs && node --check lib/request.mjs && node --check lib/usage.mjs && node --check lib/util.mjs"
+    "check": "node --check index.mjs && node --check lib/auth.mjs && node --check lib/catalog.mjs && node --check lib/checkin.mjs && node --check lib/constants.mjs && node --check lib/request.mjs && node --check lib/usage.mjs && node --check lib/util.mjs"
   },
   "magpie": {
     "name": "LobsterAI",
