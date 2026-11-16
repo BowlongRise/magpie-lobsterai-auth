@@ -19,12 +19,13 @@ Provider id: `lobsterai`. After sign-in, models appear as `lobsterai/<model>`.
 ## Install
 
 ```bash
-magpie plugin add ./magpie-lobsterai-auth
-# or, after pushing to GitHub:
-magpie plugin add github:<owner>/magpie-lobsterai-auth
-
-# or, after publishing to npm:
 magpie plugin add magpie-lobsterai-auth
+```
+
+Or install straight from GitHub, without npm:
+
+```bash
+magpie plugin add github:BowlongRise/magpie-lobsterai-auth
 ```
 
 ```bash
@@ -54,9 +55,14 @@ Requests carry the account's Bearer token, LobsterAI client headers and
 ## Development
 
 ```bash
+git clone https://github.com/BowlongRise/magpie-lobsterai-auth.git
+magpie plugin add ./magpie-lobsterai-auth
 npm test
 npm run check
 ```
+
+See [CONTRIBUTING.md](https://github.com/BowlongRise/magpie-lobsterai-auth/blob/main/CONTRIBUTING.md)
+for the release process.
 
 ## License
 

@@ -29,17 +29,16 @@ English: [README.en.md](README.en.md)
 
 ## 安装
 
-先在 LobsterAI 官网或桌面端确认账号可用。然后：
+先在 LobsterAI 官网或桌面端确认账号可用，然后：
 
 ```bash
-# 从本地文件夹加载（开发时）
-magpie plugin add ./magpie-lobsterai-auth
-
-# 上传到 GitHub 后
-magpie plugin add github:<你的 GitHub 用户名>/magpie-lobsterai-auth
-
-# 发布到 npm 后
 magpie plugin add magpie-lobsterai-auth
+```
+
+也可以直接从 GitHub 安装，不经过 npm：
+
+```bash
+magpie plugin add github:BowlongRise/magpie-lobsterai-auth
 ```
 
 登录并测试：
@@ -51,8 +50,8 @@ magpie provider test lobsterai
 magpie quota
 ```
 
-在 Magpie 桌面端：打开 **插件 → 添加插件**，填文件夹路径或 GitHub 仓库；然后在
-**供应商 → LobsterAI** 里点登录。
+在 Magpie 桌面端：打开 **插件 → 添加插件**，填 `magpie-lobsterai-auth` 或 GitHub
+仓库地址；然后在 **供应商 → LobsterAI** 里点登录。
 
 ## 登录方式
 
@@ -116,11 +115,15 @@ Magpie 把插件账号保存在自己的 `plugin-auth.json`（权限 600）。�
 ## 开发
 
 ```bash
+git clone https://github.com/BowlongRise/magpie-lobsterai-auth.git
+magpie plugin add ./magpie-lobsterai-auth
 npm test
 npm run check
 ```
 
 测试使用 Node 内置的 `node:test`，网络请求全部 mock，不需要 LobsterAI 账号。
+
+发布流程见 [CONTRIBUTING.md](https://github.com/BowlongRise/magpie-lobsterai-auth/blob/main/CONTRIBUTING.md)。
 
 ## 许可
 
