@@ -1,8 +1,12 @@
 # magpie-lobsterai-auth
 
+[![npm](https://img.shields.io/npm/v/magpie-lobsterai-auth)](https://www.npmjs.com/package/magpie-lobsterai-auth)
+[![CI](https://github.com/BowlongRise/magpie-lobsterai-auth/actions/workflows/test.yml/badge.svg)](https://github.com/BowlongRise/magpie-lobsterai-auth/actions/workflows/test.yml)
+[![license](https://img.shields.io/npm/l/magpie-lobsterai-auth)](LICENSE)
+
 把 **网易有道 LobsterAI（有道龙虾）** 的套餐模型接入 Magpie / OpenCode。
 
-English: [README.en.md](README.en.md)
+[English](README.en.md) · [更新日志](CHANGELOG.md) · [参与贡献](CONTRIBUTING.md) · [问题反馈](https://github.com/BowlongRise/magpie-lobsterai-auth/issues)
 
 插件 id：`lobsterai`。登录后，Magpie 里会出现 `lobsterai/<模型>`，例如
 `lobsterai/deepseek-flash`、`lobsterai/qwen3.8-max`、`lobsterai/kimi-k3`。
@@ -28,9 +32,16 @@ English: [README.en.md](README.en.md)
 - **企业账号**：识别登录响应里的企业上下文，并发送 `X-LobsterAI-Account-Mode` /
   `X-LobsterAI-Enterprise-Id`。
 
+## 环境要求
+
+- Magpie（桌面端或 `magpie web` 都可以）；每日签到依赖 `auth.checkin`，需要 Magpie 0.1.1083
+  或更新版本。
+- LobsterAI 账号，免费版即可；**不需要**安装 LobsterAI 桌面端。
+- 只有从源码开发或跑测试才需要 Node.js 20.3 以上。
+
 ## 安装
 
-先在 LobsterAI 官网或桌面端确认账号可用，然后：
+先在 [LobsterAI](https://lobsterai.youdao.com/) 官网或桌面端确认账号可用，然后：
 
 ```bash
 magpie plugin add magpie-lobsterai-auth
@@ -124,6 +135,9 @@ https://lobsterai-server.youdao.com/api/proxy/v1/chat/completions
 Magpie 把插件账号保存在自己的 `plugin-auth.json`（权限 600）。插件**不会读取** LobsterAI
 桌面端的数据库、Cookie 或凭据文件，也不会把 token 写进日志。
 
+插件只和 LobsterAI 自己的服务器通信（`lobsterai-server.youdao.com`、
+`api-overmind.youdao.com`、`lobsterai.youdao.com`），不含遥测，不把任何数据发往别处。
+
 ## 每日签到
 
 插件提供 Magpie 的 `auth.checkin` 钩子，走 LobsterAI 自己的活动接口：
@@ -156,6 +170,20 @@ Magpie 插件市场里的 `magpie-providers-hub` 也接了 LobsterAI 渠道（pr
   `X-LobsterAI-Enterprise-Id`。
 
 同一个账号在两个插件里登录的是同一条渠道，积分池也是同一个。
+
+## 常见问题
+
+**在 Magpie 里搜不到这个插件？** npm 的搜索索引对新包有延迟，直接按名字安装即可：
+`magpie plugin add magpie-lobsterai-auth`。
+
+**登录成功但模型是空的？** 可能是账号套餐里没有可访问的模型，或 `/api/models/available`
+暂时失败；插件会退回内置快照，稍后重新登录或刷新即可。
+
+**卡片上的积分比 LobsterAI 客户端少？** 0.2.1 之前的版本只读 `/api/user/quota`，会漏掉
+签到和活动赠送的积分。更新到最新版即可，见 [更新日志](CHANGELOG.md)。
+
+**签到没领到？** 活动未开始或已结束时返回 `inactive`，当天不再重试；登录过期会返回
+`failed` 并提示重新登录。
 
 ## 开发
 

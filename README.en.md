@@ -1,7 +1,13 @@
 # magpie-lobsterai-auth
 
+[![npm](https://img.shields.io/npm/v/magpie-lobsterai-auth)](https://www.npmjs.com/package/magpie-lobsterai-auth)
+[![CI](https://github.com/BowlongRise/magpie-lobsterai-auth/actions/workflows/test.yml/badge.svg)](https://github.com/BowlongRise/magpie-lobsterai-auth/actions/workflows/test.yml)
+[![license](https://img.shields.io/npm/l/magpie-lobsterai-auth)](LICENSE)
+
 An **unofficial** Magpie / OpenCode provider plugin for **NetEase Youdao LobsterAI**
 (有道龙虾).
+
+[中文](README.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/BowlongRise/magpie-lobsterai-auth/issues)
 
 Provider id: `lobsterai`. After sign-in, models appear as `lobsterai/<model>`.
 
@@ -17,7 +23,17 @@ Provider id: `lobsterai`. After sign-in, models appear as `lobsterai/<model>`.
 - Multiple accounts through Magpie's account scope.
 - Enterprise context headers when the sign-in response names an enterprise.
 
+## Requirements
+
+- Magpie, desktop app or `magpie web`. The daily check-in uses `auth.checkin` and
+  needs Magpie 0.1.1083 or later.
+- A LobsterAI account; the free plan is enough. The LobsterAI desktop app is not
+  required.
+- Node.js 20.3+ only when working on the source or running the tests.
+
 ## Install
+
+Make sure the account works on [LobsterAI](https://lobsterai.youdao.com/) first, then:
 
 ```bash
 magpie plugin add magpie-lobsterai-auth
@@ -52,6 +68,9 @@ Requests carry the account's Bearer token, LobsterAI client headers and
   LobsterAI desktop app's database, cookies or credential files.
 - LobsterAI's `yd-fast` / `yd-ultra` entries are server-side virtual presets
   that must be resolved per session, so this plugin lists real models only.
+- The plugin talks only to LobsterAI's own servers (`lobsterai-server.youdao.com`,
+  `api-overmind.youdao.com`, `lobsterai.youdao.com`). It carries no telemetry and
+  sends nothing anywhere else.
 
 ## Daily check-in
 
@@ -103,6 +122,22 @@ endpoint. It differs from this package in that:
   when the sign-in response names an enterprise.
 
 Both sign in to the same channel with the same account, and share one credit pool.
+
+## FAQ
+
+**Can't find the plugin in Magpie's search?** npm's search index lags behind new
+packages; install it by name: `magpie plugin add magpie-lobsterai-auth`.
+
+**Signed in but no models?** The plan may expose none right now, or
+`/api/models/available` failed; the plugin falls back to its built-in snapshot and
+refreshes on the next sign-in.
+
+**The credit balance is lower than in LobsterAI?** Versions before 0.2.1 read only
+`/api/user/quota` and missed the check-in and campaign credits. Update to the latest
+release, see [CHANGELOG.md](CHANGELOG.md).
+
+**Check-in didn't claim anything?** An activity that has not started or has ended
+returns `inactive` and is not retried that day; an expired sign-in returns `failed`.
 
 ## Development
 
