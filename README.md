@@ -22,7 +22,7 @@ English: [README.en.md](README.en.md)
 - **动态模型列表**：登录后读取账号可用的套餐模型，而不是写死一份静态列表。
 - **思考档位**：复刻 LobsterAI 的 `lobsterai_options` 请求字段；Kimi K3 按其固定契约发送。
 - **自动续期**：提供 `auth.refresh`，并在请求前检查 JWT 过期时间。
-- **积分用量**：读取 `/api/user/quota`，在 Magpie 账号卡片和 `magpie quota` 中显示套餐积分。
+- **积分用量**：合计套餐池和签到/活动赠送积分，在 Magpie 账号卡片和 `magpie quota` 中显示真实余额。
 - **每日签到**：提供 `auth.checkin`，手动或每天自动领取 LobsterAI 的每日签到积分。
 - **多账号**：Magpie 的账号作用域内工作，不会把一个账号的 token 用到另一个账号。
 - **企业账号**：识别登录响应里的企业上下文，并发送 `X-LobsterAI-Account-Mode` /
@@ -93,6 +93,17 @@ Kimi、MiniMax、Doubao 等真实模型。
 模型上的 `rate` 是 LobsterAI 的积分倍率，不是美元价格。`limitedFreeActive` 为 true 的模型
 会标记为免费。
 
+## 积分用量
+
+LobsterAI 把积分分成两块，插件两个接口都读：
+
+- `GET /api/user/quota` —— 套餐自己的池子（免费版就是 `freeCreditsTotal` 300）。
+- `GET /api/user/profile-summary` —— `creditItems` 列出每一笔来源（新用户赠送、每日登录奖励……）
+  和各自到期日，`totalCreditsRemaining` 是合计数。
+
+所以账号卡片会按来源分别显示，余额取 `totalCreditsRemaining`：300 的赠送 + 每天签到 100，
+签到两天就是 500。只读 `/api/user/quota` 会少算签到和活动发的部分。
+
 ## 请求端点
 
 插件直连 LobsterAI 的模型代理，不启动桌面客户端：
@@ -139,7 +150,7 @@ Magpie 插件市场里的 `magpie-providers-hub` 也接了 LobsterAI 渠道（pr
 - 那个是十一个渠道的聚合包，本插件是只做 LobsterAI 的独立包，升级和排错都互不影响。
 - 本插件发送 LobsterAI 的 `lobsterai_options` 思考档位，并遵守 Kimi K3 的固定请求契约；
   聚合包没有这两个。
-- 本插件从 `/api/user/quota` 显示套餐积分用量，聚合包的 LobsterAI 条目没有用量钩子。
+- 本插件把套餐池和活动赠送积分合计后显示真实余额，聚合包的 LobsterAI 条目没有用量钩子。
 - 本插件提供每日签到（`auth.checkin`），聚合包的 LobsterAI 条目没有签到钩子。
 - 本插件识别登录响应里的企业上下文，发送 `X-LobsterAI-Account-Mode` /
   `X-LobsterAI-Enterprise-Id`。

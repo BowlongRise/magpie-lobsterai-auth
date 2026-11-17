@@ -12,7 +12,7 @@ Provider id: `lobsterai`. After sign-in, models appear as `lobsterai/<model>`.
 - Live account model catalog from `GET /api/models/available`.
 - LobsterAI `lobsterai_options` thinking levels, including the Kimi K3 contract.
 - JWT-aware token renewal through `auth.refresh`.
-- Credit usage from `GET /api/user/quota`.
+- Credit usage that adds the plan pool and the campaign credits (daily check-in, gifts) together.
 - Daily check-in through magpie's `auth.checkin`, on demand or once a day.
 - Multiple accounts through Magpie's account scope.
 - Enterprise context headers when the sign-in response names an enterprise.
@@ -73,6 +73,18 @@ ended, or not a daily check-in) or `failed` with `signIn: "expired"`.
 LobsterAI), so magpie asks again then instead of guessing from the local clock.
 LobsterAI's one-off "startup credit" activity is not part of the check-in hook.
 
+## Credits
+
+LobsterAI splits credits in two, and the plugin reads both:
+
+- `GET /api/user/quota` — the plan's own pool (300 `freeCreditsTotal` on the free plan).
+- `GET /api/user/profile-summary` — `creditItems` lists each source (new-user gift, daily
+  login reward, …) with its expiry, and `totalCreditsRemaining` is the sum.
+
+The account card shows one row per source and takes the balance from
+`totalCreditsRemaining`: a 300 gift plus 100 a day of check-in is 500 after two days.
+Reading `/api/user/quota` alone misses the campaign part.
+
 ## Relation to Providers Hub
 
 `magpie-providers-hub` in the Magpie plugin market also covers the LobsterAI
@@ -83,8 +95,8 @@ endpoint. It differs from this package in that:
   debugging are independent;
 - this package sends LobsterAI's `lobsterai_options` thinking levels and follows
   Kimi K3's fixed request contract, which the hub does not;
-- this package shows plan credit usage from `/api/user/quota`, which the hub's
-  LobsterAI entry has no usage hook for;
+- this package adds the plan pool and the campaign credits together, which the
+  hub's LobsterAI entry has no usage hook for;
 - this package runs the daily check-in (`auth.checkin`), which the hub's
   LobsterAI entry does not;
 - this package sends `X-LobsterAI-Account-Mode` / `X-LobsterAI-Enterprise-Id`

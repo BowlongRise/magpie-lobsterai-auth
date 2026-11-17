@@ -44,3 +44,60 @@ test("unknown quota produces no invented usage", () => {
   assert.equal("balance" in usage, false);
   assert.equal(usage.signIn, "kept");
 });
+
+test("campaign credits from profile-summary make up the real balance", () => {
+  const usage = normalizeQuota(
+    {
+      planName: "免费",
+      subscriptionStatus: "free",
+      freeCreditsTotal: 300,
+      freeCreditsUsed: 0,
+      freeCreditsRemaining: 300,
+    },
+    {},
+    {
+      totalCreditsRemaining: 500,
+      creditItems: [
+        {
+          type: "free",
+          label: "新用户赠送",
+          creditsRemaining: 300,
+          expiresAt: "2026-11-30T13:38:15",
+        },
+        {
+          type: "campaign",
+          label: "每日登录奖励",
+          creditsRemaining: 100,
+          expiresAt: "2026-12-16T13:47:13",
+        },
+        {
+          type: "campaign",
+          label: "每日登录奖励",
+          creditsRemaining: 100,
+          expiresAt: "2026-12-17T14:57:43",
+        },
+      ],
+    },
+  );
+
+  assert.equal(usage.balance, "500 credits");
+  assert.deepEqual(
+    usage.windows.map((window) => window.limit),
+    [300, 100, 100],
+  );
+  assert.equal(usage.windows[1].name, "每日登录奖励 · 12-16 到期");
+});
+
+test("a missing profile falls back to the plan quota", () => {
+  const usage = normalizeQuota({
+    planName: "免费",
+    subscriptionStatus: "free",
+    freeCreditsTotal: 300,
+    freeCreditsUsed: 30,
+  });
+  assert.equal(usage.balance, "270 credits");
+  assert.deepEqual(
+    usage.windows.map((window) => window.name),
+    ["Free credits"],
+  );
+});

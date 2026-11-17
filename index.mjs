@@ -51,6 +51,23 @@ async function responseJson(response) {
   return parseJson(await response.text());
 }
 
+// Campaign credits (daily check-in, new-user gift) live in profile-summary's
+// creditItems; /api/user/quota only carries the plan's own pool.
+async function readCreditProfile(ctx) {
+  try {
+    const response = await authorizedFetch(
+      withQuery(PROFILE_PATH),
+      { method: "GET", headers: { accept: "application/json" } },
+      ctx,
+    );
+    const body = await responseJson(response);
+    if (!response.ok || !body || body.code !== 0 || !body.data) return null;
+    return body.data;
+  } catch {
+    return null;
+  }
+}
+
 function authFailure(message) {
   return Object.assign(new Error(message), { signIn: "expired" });
 }
@@ -304,6 +321,7 @@ export async function LobsterAIAuthPlugin({ client } = {}) {
           const renewed = Boolean(latest?.access && latest.access !== auth.access);
           const body = await responseJson(response);
           const kept = response.headers.get("X-Magpie-Sign-In") === "kept";
+          const profile = await readCreditProfile({ getAuth, client, fetchImpl: fetch });
           if (!kept && (response.status === 401 || isExpiredCode(body?.code))) {
             return {
               error: firstString(body?.message, "LobsterAI 登录已过期，请重新登录"),
@@ -319,7 +337,7 @@ export async function LobsterAIAuthPlugin({ client } = {}) {
             };
           }
           return {
-            ...normalizeQuota(body.data, latest ?? auth),
+            ...normalizeQuota(body.data, latest ?? auth, profile),
             signIn: renewed ? "renewed" : "kept",
           };
         } catch (error) {
