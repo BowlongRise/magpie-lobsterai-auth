@@ -55,8 +55,9 @@ git push origin main --tags
 
 ### GitHub Release
 
-`.github/workflows/release.yml` 会在推送 `v*` tag 时，从 `CHANGELOG.md` 抽出对应段落建一个
-Release，并附上上一版本到本版本的 compare 链接；已经存在的 Release 会跳过。
+`.github/workflows/publish.yml` 在 npm 发布成功后，会从 `CHANGELOG.md` 抽出对应段落建一个
+Release，并附上上一版本到本版本的 compare 链接；已经存在的 Release 会跳过，发布失败时
+不会留下一个指向未上架版本的 Release。
 
 历史补建：在 Actions 里手动运行 `release`，`tag` 留空即可为所有缺 Release 的 tag 补齐。
 本地可以先看会生成什么：
