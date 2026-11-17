@@ -52,3 +52,15 @@ git push origin main --tags
 - Repository：`magpie-lobsterai-auth`
 - Workflow filename：`publish.yml`
 - Environment：留空
+
+### GitHub Release
+
+`.github/workflows/release.yml` 会在推送 `v*` tag 时，从 `CHANGELOG.md` 抽出对应段落建一个
+Release，并附上上一版本到本版本的 compare 链接；已经存在的 Release 会跳过。
+
+历史补建：在 Actions 里手动运行 `release`，`tag` 留空即可为所有缺 Release 的 tag 补齐。
+本地可以先看会生成什么：
+
+```bash
+GITHUB_REPOSITORY=BowlongRise/magpie-lobsterai-auth node scripts/release.mjs --dry-run
+```
