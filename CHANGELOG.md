@@ -3,6 +3,29 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循
 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.3.0] - 2026-11-18
+
+### 新增
+
+- 请求文本分两层规范化：固定改写已知会被服务端拒绝的句式；另一个插件选项 `hide_dsh`
+  默认开启，从系统指令和工具描述里隐去 DeepSeek Harness 名称，可在 Magpie 里关闭。
+- 聊天请求补齐桌面端的调用上下文：`traceparent`、`x-lobster-turn-id`、
+  `x-lobster-user-message`（用户消息前 200 字符）、`sec-fetch-*`、`accept-language`、
+  `priority`。
+
+### 变更
+
+- 客户端标识对齐实测的 LobsterAI 2026.11.16：客户端版本头、能力声明（新增
+  `virtual-models-v1`）和 Windows 下的 User-Agent。
+
+### 修复
+
+- 积分卡片每行只显示服务端给的剩余额度，不再出现 `0 / 剩余` 这种假比例；到期日按北京时间计算。
+
+### 文档
+
+- README 增加提示：LobsterAI 明确要求不要通过第三方插件转接账号额度。
+
 ## [0.2.2] - 2026-11-17
 
 ### 文档
@@ -51,6 +74,7 @@
 - 首次发布：浏览器登录与回调、Token 手动登录、动态模型列表、`lobsterai_options`
   思考档位与 Kimi K3 请求契约、Token 自动续期、积分用量、多账号、企业账号请求头。
 
+[0.3.0]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.1.3...v0.2.0

@@ -6,9 +6,73 @@ import {
   applyKimiK3Contract,
   isKimiK3,
   requestHeaders,
+  applyClientTrace,
   resolveThinkingLevel,
 } from "../lib/request.mjs";
 import { modelInfo, rememberServerModels } from "../lib/catalog.mjs";
+import { WINDOWS_CLIENT_USER_AGENT } from "../lib/constants.mjs";
+
+test("sets the observed desktop user agent on Windows", () => {
+  const headers = requestHeaders("test-token");
+  if (process.platform === "win32") assert.equal(headers.get("user-agent"), WINDOWS_CLIENT_USER_AGENT);
+  else assert.equal(headers.has("user-agent"), false);
+});
+
+test("chat requests carry the desktop trace context and user message", () => {
+  const headers = applyClientTrace(
+    new Headers({ accept: "application/json" }),
+    JSON.stringify({
+      model: "deepseek-flash",
+      messages: [
+        { role: "system", content: "sys" },
+        { role: "user", content: "你好" },
+      ],
+    }),
+  );
+  const trace = /^00-([0-9a-f]{32})-([0-9a-f]{16})-01$/.exec(headers.get("traceparent"));
+  assert.ok(trace, "traceparent has the W3C shape");
+  assert.equal(headers.get("x-lobster-turn-id"), trace[1]);
+  assert.equal(headers.get("x-lobster-user-message"), "%E4%BD%A0%E5%A5%BD");
+  assert.equal(headers.get("sec-fetch-site"), "none");
+});
+
+test("hides DeepSeek Harness in instructions while preserving paths and tool results", () => {
+  const input = {
+    model: "kimi-k3",
+    messages: [
+      { role: "system", content: "You are an AI agent powered by DeepSeek Harness. Use /root/DSH/ and DSH.md." },
+      { role: "user", content: "Tell me about DeepSeek Harness" },
+      { role: "tool", content: "DeepSeek Harness" },
+    ],
+    tools: [{ function: { name: "read", description: "Read for DeepSeek Harness" } }],
+  };
+  const output = JSON.parse(adaptRequestBody(JSON.stringify(input)));
+  assert.equal(output.messages[0].content, "You are an AI agent. Use /root/DSH/ and DSH.md.");
+  assert.equal(output.messages[1].content, input.messages[1].content);
+  assert.equal(output.messages[2].content, input.messages[2].content);
+  assert.equal(output.tools[0].function.description, "Read for the agent harness");
+  const unhidden = JSON.parse(adaptRequestBody(JSON.stringify(input), undefined, false));
+  assert.equal(
+    unhidden.messages[0].content,
+    "You are an AI agent, powered by DeepSeek Harness. Use /root/DSH/ and DSH.md.",
+  );
+  assert.equal(unhidden.messages[2].content, input.messages[2].content);
+});
+
+test("always rewords the measured lines, even with the hide switch off", () => {
+  const input = {
+    model: "deepseek-flash",
+    messages: [
+      { role: "system", content: "You are Claude Code, Anthropic's official CLI for Claude." },
+      { role: "user", content: "x-anthropic-billing-header: abc\nCodex CLI is an open source project led by OpenAI." },
+      { role: "tool", content: "the Codex CLI is an open source project led by OpenAI." },
+    ],
+  };
+  const output = JSON.parse(adaptRequestBody(JSON.stringify(input), undefined, false));
+  assert.equal(output.messages[0].content, "You are Claude Code, Anthropic's CLI for Claude.");
+  assert.equal(output.messages[1].content, "The Codex CLI is an open source project led by OpenAI.");
+  assert.equal(output.messages[2].content, input.messages[2].content);
+});
 
 test("thinking effort is folded into lobsterai_options", () => {
   const text = JSON.stringify({

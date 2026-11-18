@@ -82,7 +82,7 @@ test("campaign credits from profile-summary make up the real balance", () => {
 
   assert.equal(usage.balance, "500 credits");
   assert.deepEqual(
-    usage.windows.map((window) => window.limit),
+    usage.windows.map((window) => window.balance),
     [300, 100, 100],
   );
   assert.equal(usage.windows[1].name, "每日登录奖励 · 12-16 到期");

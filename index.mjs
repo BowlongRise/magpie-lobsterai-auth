@@ -145,7 +145,7 @@ async function validatePastedTokens(access, refresh) {
   };
 }
 
-export async function LobsterAIAuthPlugin({ client } = {}) {
+export async function LobsterAIAuthPlugin({ client, magpie } = {}) {
   return {
     config: async (cfg) => {
       cfg.provider ??= {};
@@ -168,6 +168,15 @@ export async function LobsterAIAuthPlugin({ client } = {}) {
       maxConcurrency: MAX_CONCURRENCY,
       refreshLead: REFRESH_LEAD_MS,
       rotating: true,
+
+      options: [{
+        key: "hide_dsh",
+        label: "Hide DeepSeek Harness's name",
+        description: "Remove DeepSeek Harness names from system instructions and tool descriptions. This does not prevent account restrictions.",
+        default: true,
+        labels: { zh: "隐去 DeepSeek Harness 的名字" },
+        descriptions: { zh: "从系统指令和工具描述中隐去 DeepSeek Harness 名称；不能保证避免账号受限。" },
+      }],
 
       methods: [
         {
@@ -268,7 +277,7 @@ export async function LobsterAIAuthPlugin({ client } = {}) {
       async loader(getAuth) {
         const auth = await readAuth(getAuth);
         if (!auth?.access && !auth?.refresh) return {};
-        const ctx = { getAuth, client, fetchImpl: fetch };
+        const ctx = { getAuth, client, fetchImpl: fetch, hideDsh: () => magpie?.option?.(PROVIDER, "hide_dsh") !== false };
         return {
           baseURL: PROXY_BASE,
           apiKey: "lobsterai",
