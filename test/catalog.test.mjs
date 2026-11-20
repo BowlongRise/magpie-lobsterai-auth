@@ -42,6 +42,18 @@ test("server metadata replaces the static entry", () => {
   assert.equal(info.thinking.defaultLevel, "medium");
 });
 
+test("a model that offers selectable context windows reports the largest", () => {
+  const info = infoFromServerModel({
+    modelId: "deepseek-flash",
+    contextWindow: 400_000,
+    contextWindowOptions: [400_000, 600_000, 800_000, 1_000_000],
+  });
+  assert.equal(info.context, 1_000_000);
+
+  const plain = infoFromServerModel({ modelId: "deepseek-flash", contextWindow: 400_000 });
+  assert.equal(plain.context, 400_000);
+});
+
 test("Magpie model carries limits, images, variants and rate", () => {
   const model = magpieModel(modelInfo("glm-5.3-flash"));
   assert.equal(model.limit.context, 1_000_000);

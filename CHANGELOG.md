@@ -3,6 +3,17 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循
 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.3.1] - 2026-11-21
+
+### 修复
+
+- 模型上下文窗口取 `/api/models/available` 的 `contextWindowOptions` 最大值：`deepseek-flash`
+  现在提供 400K/600K/800K/1M，插件报 1M；没有 options 时仍回退 `contextWindow`。
+
+### 文档
+
+- README 的模型小节说明上下文数值来自上游接口。
+
 ## [0.3.0] - 2026-11-18
 
 ### 新增
@@ -74,6 +85,7 @@
 - 首次发布：浏览器登录与回调、Token 手动登录、动态模型列表、`lobsterai_options`
   思考档位与 Kimi K3 请求契约、Token 自动续期、积分用量、多账号、企业账号请求头。
 
+[0.3.1]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.0...v0.2.1
