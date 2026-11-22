@@ -3,6 +3,19 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循
 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.0] - 2026-11-22
+
+### 新增
+
+- 新增「LobsterAI 账号（粘贴回调地址）」登录方式（`method: "code"`），适用于 Magpie 跑在
+  Docker 或远程服务器、浏览器访问不到容器内 `127.0.0.1` 回调的场景：登录完成后把跳转后的
+  回调地址（或其中的 `code`）粘贴回来即可。由 @isdoge 贡献（#2）。
+- 回调输入会校验 `state`，并对误贴登录页链接、缺少 `code` 等情况给出明确报错。
+
+### 变更
+
+- 浏览器登录与粘贴回调登录共用登录 URL 构造和登录结果拼装逻辑。
+
 ## [0.3.1] - 2026-11-21
 
 ### 修复
@@ -85,6 +98,7 @@
 - 首次发布：浏览器登录与回调、Token 手动登录、动态模型列表、`lobsterai_options`
   思考档位与 Kimi K3 请求契约、Token 自动续期、积分用量、多账号、企业账号请求头。
 
+[0.4.0]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/BowlongRise/magpie-lobsterai-auth/compare/v0.2.1...v0.2.2
