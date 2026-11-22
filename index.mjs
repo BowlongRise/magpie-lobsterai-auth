@@ -13,8 +13,10 @@ import {
 import {
   accountFromAccess,
   beginBrowserLogin,
+  beginManualBrowserLogin,
   enterpriseFromPayload,
   exchangeCode,
+  parseCallbackInput,
   refreshTokens,
   tokenExpiry,
 } from "./lib/auth.mjs";
@@ -84,6 +86,27 @@ async function readAuth(getAuth) {
 function accountLabel(account, enterprise) {
   if (!enterprise?.enterpriseId) return account.accountId;
   return `${account.accountId} · ${enterprise.enterpriseName || enterprise.enterpriseId}`;
+}
+
+function authResultFromExchange(data) {
+  const account = accountFromAccess(data.access, data.user);
+  const enterprise =
+    data.enterprise ??
+    (account.enterpriseId
+      ? { enterpriseId: account.enterpriseId, accountMode: "enterprise" }
+      : null);
+  return {
+    type: "success",
+    access: data.access,
+    refresh: data.refresh,
+    expires: account.expires || tokenExpiry(data.access),
+    accountId: accountLabel(account, enterprise),
+    ...(account.uid ? { uid: account.uid } : {}),
+    ...(account.email ? { email: account.email } : {}),
+    ...(account.name ? { name: account.name } : {}),
+    ...(enterprise ?? {}),
+    quota: data.quota,
+  };
 }
 
 async function validatePastedTokens(access, refresh) {
@@ -193,24 +216,7 @@ export async function LobsterAIAuthPlugin({ client, magpie } = {}) {
                   try {
                     const code = await flow.waitForCode(callbackOptions.signal);
                     const data = await exchangeCode(code);
-                    const account = accountFromAccess(data.access, data.user);
-                    const enterprise =
-                      data.enterprise ??
-                      (account.enterpriseId
-                        ? { enterpriseId: account.enterpriseId, accountMode: "enterprise" }
-                        : null);
-                    return {
-                      type: "success",
-                      access: data.access,
-                      refresh: data.refresh,
-                      expires: account.expires || tokenExpiry(data.access),
-                      accountId: accountLabel(account, enterprise),
-                      ...(account.uid ? { uid: account.uid } : {}),
-                      ...(account.email ? { email: account.email } : {}),
-                      ...(account.name ? { name: account.name } : {}),
-                      ...(enterprise ?? {}),
-                      quota: data.quota,
-                    };
+                    return authResultFromExchange(data);
                   } catch (error) {
                     return {
                       type: "failed",
@@ -218,6 +224,39 @@ export async function LobsterAIAuthPlugin({ client, magpie } = {}) {
                     };
                   } finally {
                     await flow.close();
+                  }
+                },
+              };
+            } catch (error) {
+              return {
+                type: "failed",
+                error: error instanceof Error ? error.message : String(error),
+              };
+            }
+          },
+        },
+        {
+          type: "oauth",
+          label: "LobsterAI 账号（粘贴回调地址）",
+          labels: { en: "LobsterAI Account (Paste Callback URL)" },
+          async authorize(_inputs, { signal } = {}) {
+            try {
+              const flow = await beginManualBrowserLogin({ signal });
+              return {
+                url: flow.url,
+                instructions:
+                  "请在浏览器中完成 LobsterAI 登录；跳转后若页面无法访问（如服务器或 Docker 环境），请复制浏览器地址栏的完整回调地址（或其中的 code）粘贴到下方。",
+                method: "code",
+                async callback(input) {
+                  try {
+                    const code = parseCallbackInput(input, flow.state);
+                    const data = await exchangeCode(code);
+                    return authResultFromExchange(data);
+                  } catch (error) {
+                    return {
+                      type: "failed",
+                      error: error instanceof Error ? error.message : String(error),
+                    };
                   }
                 },
               };
@@ -419,10 +458,12 @@ export const _internal = {
   QUOTA_PATH,
   accountFromAccess,
   beginBrowserLogin,
+  beginManualBrowserLogin,
   claimDailyCheckIn,
   exchangeCode,
   modelInfo,
   normalizeQuota,
+  parseCallbackInput,
   parseJson,
   refreshTokens,
   sessionHeader,
